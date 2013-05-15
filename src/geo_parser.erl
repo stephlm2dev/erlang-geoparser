@@ -5,66 +5,105 @@
 -export ([analyser/1]).
 
 -define(is_string(X),(is_list(X))).
--define(Ville, {"paris", "besancon", "bordeaux", "caen", "dijon", "la rochelle",
+-define(is_positif(X), (is_integer(X) andalso X > 0)).
+-define(Ville, {"besancon", "bordeaux", "caen", "dijon", "la rochelle",
 				"lille", "lyon", "marseille", "metz", "montpelliez", "nancy", 
-				"nantes", "nice", "perpignan", "rennes", "rouen", "strasbourg", 
-				"toulouse", "vannes"}).
--define(Region, {"ile-de-france", "alsace", "aquitaine", "bourgogne", "bretagne",
-				 "centre", "franche-comte", "languedoc-roussillon", "lorraine",
-				 "midi-pyrenees", "nord-pas-de-calais", "pays-de-la-loire",
-				 "provence-alpes-cotes-d'azur", "rhone-alpes"}).
+				"nantes", "nice", "paris", "perpignan", "rennes", "rouen", 
+				"strasbourg", "toulouse", "vannes"}).
+-define(Coordonnees_Villes, {
+	{5.941030, 47.208752, 6.065190, 47.274250},
+	{0.643330, 44.808201, -0.528030, 44.919491},
+	{-0.418990, 49.147480, -0.318410, 49.217770},
+	{ 4.987000, 47.277100, 5.082540, 47.360401} ,
+	{-1.228850, 46.137291, -1.100650, 46.179859},
+	{2.957110, 50.573502, 3.179220, 50.695110} ,
+	{4.768930, 45.704479, 4.901690, 45.808578},
+	{ 5.290060, 43.192768, 5.568580, 43.420399},
+	{ 6.117290, 49.073479, 6.256330, 49.164261},
+	{ 3.808790, 43.570599, 3.926250, 43.652279},
+	{6.134120, 48.666950, 6.209060, 48.709251},
+	{-1.650890, 47.168671, -1.477230, 47.294270},
+	{7.199050, 43.657860, 7.319330, 43.741329},
+	{2.086790, 48.658291, 2.637910, 49.046940},
+	{ 2.853150, 42.665379, 2.936420, 42.747700},
+	{-1.759150, 48.056831, -1.592190, 48.150749},
+	{ 1.002850, 49.334671, 1.157690, 49.489231} ,
+	{7.687340, 48.495628, 7.827470, 48.640709},
+	{ 1.356110, 43.538830, 1.504430, 43.669842},
+	{-2.798740, 47.632038, -2.693290, 47.683498}}).
 
-% paris 		left =2.224199; bottm=48.815573; 	right=2.469921; top=48.902145
+-define(Region, {"alsace", "aquitaine", "bourgogne", "bretagne", "centre", 
+				 "franche-comte", "ile-de-france", "languedoc-roussillon", 
+				 "lorraine", "midi-pyrenees", "nord-pas-de-calais", 
+				 "pays-de-la-loire", "provence-alpes-cotes-d'azur",
+				 "rhone-alpes"}).
 
-% nord			left=-1.82; 	bottm=49.07; 		right=7.05; 	top=50.86
-% sud ouest 	left =-1.52; 	bottm=42.86; 		right=2.9; 		top=45.03
-% sud est 		left =2.9; 		bottm=43.0; 		right=7.03; 	top=45.03
-% centre 		left =-1.41; 	bottm=45.1; 		right=6.24; 	top=47.03
-% ouest 		left =-4.83; 	bottm=46.27; 		right=-0.68; 	top=48.95
-% est 			left =4.26; 	bottm=46.47; 		right=7.58; 	top=49.55
+-define(Coordonnees_Regions, {
+	{6.841000, 47.420521, 8.232620,  49.077911},
+	{-1.788780, 42.777729, 1.448270, 45.714581},
+	{4.044090, 49.317661, 4.101920, 49.385479},
+	{1.653500, 46.992729, 1.692190, 47.018871},
+	{0.052890, 46.347160, 3.128600, 48.940971},
+	{5.251320, 46.260872, 7.143480, 48.024101},
+	{1.446700, 48.120319, 3.558520, 49.241299},
+	{1.688390, 42.332272, 4.845170, 44.975811},
+	{4.888570, 47.813068, 7.640050, 49.617741},
+	{-0.327160, 42.571651, 3.451500, 45.046719},
+	{1.555360, 49.969059, 4.230930, 51.089062},
+	{-2.558920, 46.266819, 0.916640, 48.567989},
+	{4.227200, 43.159821, 7.077820, 45.126492},
+	{3.688430, 44.115379, 7.185480, 46.519890}}).
+
+% paris         left =2.224199; bottm=48.815573;    right=2.469921; top=48.902145
+
+% nord          left=-1.82;     bottm=49.07;        right=7.05;     top=50.86
+% sud ouest     left =-1.52;    bottm=42.86;        right=2.9;      top=45.03
+% sud est       left =2.9;      bottm=43.0;         right=7.03;     top=45.03
+% centre        left =-1.41;    bottm=45.1;         right=6.24;     top=47.03
+% ouest         left =-4.83;    bottm=46.27;        right=-0.68;    top=48.95
+% est           left =4.26;     bottm=46.47;        right=7.58;     top=49.55
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%									VILLES
+%                                   VILLES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Besancon      {5.941030, 47.208752, 6.065190, 47.274250}
+% Bordeaux      {0.643330, 44.808201, -0.528030, 44.919491}
+% Caen          {-0.418990, 49.147480, -0.318410, 49.217770}
+% Dijon         { 4.987000, 47.277100, 5.082540, 47.360401} 
+% La Rochelle   {-1.228850, 46.137291, -1.100650, 46.179859}
+% Lille         {2.957110, 50.573502, 3.179220, 50.695110} 
+% Lyon          {4.768930, 45.704479, 4.901690, 45.808578}
+% Marseille     { 5.290060, 43.192768, 5.568580, 43.420399} 
+% Metz          { 6.117290, 49.073479, 6.256330, 49.164261} 
+% Montpelliez   { 3.808790, 43.570599, 3.926250, 43.652279} 
+% Nancy         {6.134120, 48.666950, 6.209060, 48.709251}
+% Nantes        {-1.650890, 47.168671, -1.477230, 47.294270}
+% Nice          {7.199050, 43.657860, 7.319330, 43.741329}
+% Paris         {2.086790, 48.658291, 2.637910, 49.046940}
+% Perpignan     { 2.853150, 42.665379, 2.936420, 42.747700} 
+% Rennes        {-1.759150, 48.056831, -1.592190, 48.150749}
+% Rouen         { 1.002850, 49.334671, 1.157690, 49.489231} 
+% Strasbourg    {7.687340, 48.495628, 7.827470, 48.640709}
+% Toulouse      { 1.356110, 43.538830, 1.504430, 43.669842} 
+% Vannes        {-2.798740, 47.632038, -2.693290, 47.683498}
 
-% Paris       => NE 49.046940, 2.637910  / SW 48.658291, 2.086790
-% Nice        => NE 43.741329, 7.319330  / SW 43.657860, 7.199050
-% Bordeaux    => NE 44.919491, -0.528030 / SW 44.808201, -0.643330
-% Dijon       => NE 47.360401, 5.082540  / SW 47.277100, 4.987000
-% Caen        => NE 49.217770, -0.318410 / SW 49.147480, -0.418990
-% Marseille   => NE 43.420399, 5.568580  / SW 43.192768, 5.290060
-% Nantes      => NE 47.294270, -1.477230 / SW 47.168671, -1.650890
-% Lille       => NE 50.695110, 3.179220  / SW 50.573502, 2.957110
-% Besancon    => NE 47.274250, 6.065190  / SW 47.208752, 5.941030
-% Nancy       => NE 48.709251, 6.209060  / SW 48.666950, 6.134120
-% Lyon        => NE 45.808578, 4.901690  / SW 45.704479, 4.768930
-% Strasbourg  => NE 48.640709, 7.827470  / SW 48.495628, 7.687340
-% Vannes 	  => NE 47.683498, -2.693290 / SW 47.632038, -2.798740
-% Perpignan   => NE 42.747700, 2.936420  / SW 42.665379, 2.853150
-% Metz	      => NE 49.164261, 6.256330  / SW 49.073479, 6.117290
-% Toulouse    => NE 43.669842, 1.504430  / SW 43.538830, 1.356110
-% Montpelliez => NE 43.652279, 3.926250  / SW 43.570599, 3.808790
-% Rouen 	  => NE 49.489231, 1.157690  / SW 49.334671, 1.002850
-% La Rochelle => NE 46.179859, -1.100650 / SW 46.137291, -1.228850
-% Rennes 	  => NE 48.150749, -1.592190 / SW 48.056831, -1.759150
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%									REGIONS
+%                                   REGIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% ile-de-france
-% alsace
-% aquitaine
-% bourgogne
-% bretagne
-% centre
-% franche-comte
-% languedoc-roussillon
-% lorraine
-% midi-pyrenees
-% nord-pas-de-calais
-% pays-de-la-loire
-% provence-alpes-cotes-d'azur
-% rhone-alpes
+% alsace						{6.841000, 47.420521, 8.232620,  49.077911}
+% aquitaine						{-1.788780, 42.777729, 1.448270, 45.714581}
+% bourgogne						{4.044090, 49.317661, 4.101920, 49.385479}
+% bretagne						{1.653500, 46.992729, 1.692190, 47.018871}
+% centre						{0.052890, 46.347160, 3.128600, 48.940971}
+% franche-comte					{5.251320, 46.260872, 7.143480, 48.024101}
+% ile-de-france					{1.446700, 48.120319, 3.558520, 49.241299}
+% languedoc-roussillon			{1.688390, 42.332272, 4.845170, 44.975811}
+% lorraine						{4.888570, 47.813068, 7.640050, 49.617741}
+% midi-pyrenees					{-0.327160, 42.571651, 3.451500, 45.046719}
+% nord-pas-de-calais			{1.555360, 49.969059, 4.230930, 51.089062}
+% pays-de-la-loire				{-2.558920, 46.266819, 0.916640, 48.567989}
+% provence-alpes-cotes-d'azur	{4.227200, 43.159821, 7.077820, 45.126492}
+% rhone-alpes					{3.688430, 44.115379, 7.185480, 46.519890}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %								PROGRAMME 
@@ -87,10 +126,10 @@ analyser(Lieu) when ?is_string(Lieu) ->
 				1 -> % si ville ou une région
 					New_List_Lieu = minuscule_Tuple(List_Lieu),
 					{Lieu_saisie} = New_List_Lieu,
-					Is_ville      = is_in_Tuple(?Ville, Lieu_saisie),
-					Is_region     = is_in_Tuple(?Region, Lieu_saisie),
-					if  Is_ville   =/= 0   -> parse("Ville", Lieu_saisie);
-					    Is_region  =/= 0 -> parse("Region", Lieu_saisie);
+					Pos_ville      = is_in_Tuple(?Ville, Lieu_saisie),
+					Pos_region     = is_in_Tuple(?Region, Lieu_saisie),
+					if  Pos_ville  =/= 0 -> parse(?Coordonnees_Villes, Pos_ville);
+						Pos_region =/= 0 -> parse(?Coordonnees_Regions, Pos_region);
 						true -> "Oops! Something went wrong, please try again"
 					end;
 				_ -> "Oops! Something went wrong, please try again"
@@ -104,11 +143,9 @@ analyser(_) ->
 %							FONCTIONS PARSE 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-parse("Ville", Ville) ->
-	Ville;
-
-parse("Region", Region) ->
-	Region.
+% VILLES ET REGIONS
+parse(Type_Lieu, Position) when ?is_positif(Position) ->
+	element(Position, Type_Lieu).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %							FONCTIONS ANNEXES 

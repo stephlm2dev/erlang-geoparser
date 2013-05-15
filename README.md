@@ -1,4 +1,4 @@
-erlang-geoparser
+Erlang-geoparser
 ================
 
-A geolocalisation parser
+A geolocalisation parser made in Erlang

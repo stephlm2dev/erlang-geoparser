@@ -54,6 +54,14 @@
 	{4.227200, 43.159821, 7.077820, 45.126492},
 	{3.688430, 44.115379, 7.185480, 46.519890}}).
 
+% bourgogne, centre, ile de france, rhone-alpes
+
+-define(Nord,  {"nord-pas-de-calais"}).
+-define(Sud,   {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"}).
+-define(Ouest, {"bretagne", "pays-de-la-loire"}).
+-define(Est,   {"alsace", "franche-comte", "lorraine"}).
+
+
 % paris         left =2.224199; bottm=48.815573;    right=2.469921; top=48.902145
 
 % nord          left=-1.82;     bottm=49.07;        right=7.05;     top=50.86
@@ -88,7 +96,7 @@
 % Vannes        {-2.798740, 47.632038, -2.693290, 47.683498}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                   REGIONS
+%								 REGIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % alsace						{6.841000, 47.420521, 8.232620,  49.077911}
 % aquitaine						{-1.788780, 42.777729, 1.448270, 45.714581}
@@ -126,12 +134,16 @@ analyser(Lieu) when ?is_string(Lieu) ->
 				1 -> % si ville ou une région
 					New_List_Lieu = minuscule_Tuple(List_Lieu),
 					{Lieu_saisie} = New_List_Lieu,
-					Pos_ville      = is_in_Tuple(?Ville, Lieu_saisie),
-					Pos_region     = is_in_Tuple(?Region, Lieu_saisie),
-					if  Pos_ville  =/= 0 -> parse(?Coordonnees_Villes, Pos_ville);
-						Pos_region =/= 0 -> parse(?Coordonnees_Regions, Pos_region);
+					Pos_ville     = is_in_Tuple(?Ville, Lieu_saisie),
+					Pos_region    = is_in_Tuple(?Region, Lieu_saisie),
+					if  Pos_ville  =/= 0 -> parse({Pos_ville, ?Coordonnees_Villes});
+						Pos_region =/= 0 -> parse({Pos_region, ?Coordonnees_Regions});
 						true -> "Oops! Something went wrong, please try again"
 					end;
+				3 -> 
+					New_List_Lieu = minuscule_Tuple(List_Lieu),
+					{_,_, Point_Cardinal} = New_List_Lieu,
+					parse({"dans", "le", Point_Cardinal});
 				_ -> "Oops! Something went wrong, please try again"
 			end
 	end;
@@ -144,8 +156,30 @@ analyser(_) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % VILLES ET REGIONS
-parse(Type_Lieu, Position) when ?is_positif(Position) ->
-	element(Position, Type_Lieu).
+parse({Position, Type_Lieu}) when ?is_positif(Position) ->
+	element(Position, Type_Lieu);
+
+% DANS LE NORD 
+parse({"dans", "le", Point_Cardinal}) when Point_Cardinal =:= "nord" -> 
+	region_ToBoundingBox(?Nord);
+
+% DANS LE NORD 
+parse({"dans", "le", Point_Cardinal}) when Point_Cardinal =:= "sud" -> 
+	region_ToBoundingBox(?Sud);
+	%-define(Sud,   {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"}).
+
+% DANS LE NORD 
+parse({"dans", "l'", Point_Cardinal}) when Point_Cardinal =:= "ouest" -> 
+	region_ToBoundingBox(?Ouest);
+	%-define(Ouest, {"bretagne", "pays-de-la-loire"}).
+
+% DANS LE NORD 
+parse({"dans", "l'", Point_Cardinal}) when Point_Cardinal =:= "est" ->
+	region_ToBoundingBox(?Est);
+	%-define(Est,   {"alsace", "franche-comte", "lorraine"}).
+
+parse(_) -> 
+	"Oops! Something went wrong, please try again".
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %							FONCTIONS ANNEXES 
@@ -185,3 +219,14 @@ minuscule_Tuple(Tuple, N, Size, New) when N < Size ->
 
 minuscule_Tuple(_,_,_,New) -> list_to_tuple(New).
 
+% récupère des noms de régions pour renvoyer dans un tuple l'ensemble de
+% leur bounding box 
+
+region_ToBoundingBox(Tuple) -> region_ToBoundingBox(Tuple, 1, tuple_size(Tuple) + 1, []).
+
+region_ToBoundingBox(Tuple, N, Size, New) when N < Size -> 
+	Position = is_in_Tuple(?Region, element(N, Tuple)),
+	Nouvel_Element = element(Position, ?Coordonnees_Regions),
+	region_ToBoundingBox(Tuple, N+1, Size, lists:append(New, [Nouvel_Element]));
+
+region_ToBoundingBox(_,_,_,New) -> list_to_tuple(New).

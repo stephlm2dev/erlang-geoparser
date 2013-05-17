@@ -11,25 +11,25 @@
 				"nantes", "nice", "paris", "perpignan", "rennes", "rouen", 
 				"strasbourg", "toulouse", "vannes"}).
 -define(Coordonnees_Villes, {
-	{5.941030, 47.208752, 6.065190, 47.274250},
-	{0.643330, 44.808201, -0.528030, 44.919491},
+	{5.941030 , 47.208752, 6.065190 , 47.274250},
+	{0.643330 , 44.808201, -0.528030, 44.919491},
 	{-0.418990, 49.147480, -0.318410, 49.217770},
-	{ 4.987000, 47.277100, 5.082540, 47.360401} ,
+	{ 4.987000, 47.277100, 5.082540 , 47.360401} ,
 	{-1.228850, 46.137291, -1.100650, 46.179859},
-	{2.957110, 50.573502, 3.179220, 50.695110} ,
-	{4.768930, 45.704479, 4.901690, 45.808578},
-	{ 5.290060, 43.192768, 5.568580, 43.420399},
-	{ 6.117290, 49.073479, 6.256330, 49.164261},
-	{ 3.808790, 43.570599, 3.926250, 43.652279},
-	{6.134120, 48.666950, 6.209060, 48.709251},
+	{2.957110 , 50.573502, 3.179220 , 50.695110} ,
+	{4.768930 , 45.704479, 4.901690 , 45.808578},
+	{ 5.290060, 43.192768, 5.568580 , 43.420399},
+	{ 6.117290, 49.073479, 6.256330 , 49.164261},
+	{ 3.808790, 43.570599, 3.926250 , 43.652279},
+	{6.134120 , 48.666950, 6.209060 , 48.709251},
 	{-1.650890, 47.168671, -1.477230, 47.294270},
-	{7.199050, 43.657860, 7.319330, 43.741329},
-	{2.086790, 48.658291, 2.637910, 49.046940},
-	{ 2.853150, 42.665379, 2.936420, 42.747700},
+	{7.199050 , 43.657860, 7.319330 , 43.741329},
+	{2.086790 , 48.658291, 2.637910 , 49.046940},
+	{ 2.853150, 42.665379, 2.936420 , 42.747700},
 	{-1.759150, 48.056831, -1.592190, 48.150749},
-	{ 1.002850, 49.334671, 1.157690, 49.489231} ,
-	{7.687340, 48.495628, 7.827470, 48.640709},
-	{ 1.356110, 43.538830, 1.504430, 43.669842},
+	{ 1.002850, 49.334671, 1.157690 , 49.489231} ,
+	{7.687340 , 48.495628, 7.827470 , 48.640709},
+	{ 1.356110, 43.538830, 1.504430 , 43.669842},
 	{-2.798740, 47.632038, -2.693290, 47.683498}}).
 
 -define(Region, {"alsace", "aquitaine", "bourgogne", "bretagne", "centre", 
@@ -39,20 +39,20 @@
 				 "rhone-alpes"}).
 
 -define(Coordonnees_Regions, {
-	{6.841000, 47.420521, 8.232620,  49.077911},
+	{6.841000 , 47.420521, 8.232620,  49.077911},
 	{-1.788780, 42.777729, 1.448270, 45.714581},
-	{4.044090, 49.317661, 4.101920, 49.385479},
-	{1.653500, 46.992729, 1.692190, 47.018871},
-	{0.052890, 46.347160, 3.128600, 48.940971},
-	{5.251320, 46.260872, 7.143480, 48.024101},
-	{1.446700, 48.120319, 3.558520, 49.241299},
-	{1.688390, 42.332272, 4.845170, 44.975811},
-	{4.888570, 47.813068, 7.640050, 49.617741},
+	{4.044090 , 49.317661, 4.101920, 49.385479},
+	{1.653500 , 46.992729, 1.692190, 47.018871},
+	{0.052890 , 46.347160, 3.128600, 48.940971},
+	{5.251320 , 46.260872, 7.143480, 48.024101},
+	{1.446700 , 48.120319, 3.558520, 49.241299},
+	{1.688390 , 42.332272, 4.845170, 44.975811},
+	{4.888570 , 47.813068, 7.640050, 49.617741},
 	{-0.327160, 42.571651, 3.451500, 45.046719},
-	{1.555360, 49.969059, 4.230930, 51.089062},
+	{1.555360 , 49.969059, 4.230930, 51.089062},
 	{-2.558920, 46.266819, 0.916640, 48.567989},
-	{4.227200, 43.159821, 7.077820, 45.126492},
-	{3.688430, 44.115379, 7.185480, 46.519890}}).
+	{4.227200 , 43.159821, 7.077820, 45.126492},
+	{3.688430 , 44.115379, 7.185480, 46.519890}}).
 
 % bourgogne, centre, ile de france, rhone-alpes
 
@@ -131,19 +131,28 @@ analyser(Lieu) when ?is_string(Lieu) ->
 	if (Answer =:= true) -> "Oops! Something went wrong, please try again";
 		true -> 
 			case tuple_size(List_Lieu) of
-				1 -> % si ville ou une région
+				2 -> 
 					New_List_Lieu = minuscule_Tuple(List_Lieu),
-					{Lieu_saisie} = New_List_Lieu,
-					Pos_ville     = is_in_Tuple(?Ville, Lieu_saisie),
-					Pos_region    = is_in_Tuple(?Region, Lieu_saisie),
-					if  Pos_ville  =/= 0 -> parse({Pos_ville, ?Coordonnees_Villes});
-						Pos_region =/= 0 -> parse({Pos_region, ?Coordonnees_Regions});
-						true -> "Oops! Something went wrong, please try again"
+					{Preposition, Zone} = New_List_Lieu,
+					case Preposition of
+						"a" -> % si ville ou une région
+							Pos_ville     = is_in_Tuple(?Ville, Zone),
+							Pos_region    = is_in_Tuple(?Region, Zone),
+							if  Pos_ville  =/= 0 -> parse({Pos_ville,  ?Coordonnees_Villes});
+								Pos_region =/= 0 -> parse({Pos_region, ?Coordonnees_Regions});
+								true -> "Oops! Something went wrong, please try again"
+							end;		
+						"dans" -> % dans l'ouest ou dans l'est
+							parse({"dans", Zone});
+						_ -> "Oops! Something went wrong, please try again"
 					end;
-				3 -> 
+				3 -> % dans le sud / dans le nord
 					New_List_Lieu = minuscule_Tuple(List_Lieu),
-					{_,_, Point_Cardinal} = New_List_Lieu,
-					parse({"dans", "le", Point_Cardinal});
+					{Preposition,_, Zone} = New_List_Lieu,
+					case Preposition of
+						"a"    -> parse({"a", "la", Zone});
+						"dans" -> parse({"dans", "le", Zone})
+					end;
 				_ -> "Oops! Something went wrong, please try again"
 			end
 	end;
@@ -159,24 +168,44 @@ analyser(_) ->
 parse({Position, Type_Lieu}) when ?is_positif(Position) ->
 	element(Position, Type_Lieu);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% DANS L'OUEST 
+parse({"dans", Point_Cardinal}) when Point_Cardinal =:= "l'ouest" -> 
+	region_ToBoundingBox(?Ouest);
+	% Ouest : {"bretagne", "pays-de-la-loire"}
+
+% DANS L'EST 
+parse({"dans", Point_Cardinal}) when Point_Cardinal =:= "l'est" ->
+	region_ToBoundingBox(?Est);
+	% Est : {"alsace", "franche-comte", "lorraine"}
+
 % DANS LE NORD 
 parse({"dans", "le", Point_Cardinal}) when Point_Cardinal =:= "nord" -> 
 	region_ToBoundingBox(?Nord);
+	% Nord : {"nord-pas-de-calais"}
 
-% DANS LE NORD 
+% DANS LE SUD 
 parse({"dans", "le", Point_Cardinal}) when Point_Cardinal =:= "sud" -> 
 	region_ToBoundingBox(?Sud);
-	%-define(Sud,   {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"}).
+	% Sud : {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"}
 
-% DANS LE NORD 
-parse({"dans", "l'", Point_Cardinal}) when Point_Cardinal =:= "ouest" -> 
-	region_ToBoundingBox(?Ouest);
-	%-define(Ouest, {"bretagne", "pays-de-la-loire"}).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% DANS LE NORD 
-parse({"dans", "l'", Point_Cardinal}) when Point_Cardinal =:= "est" ->
-	region_ToBoundingBox(?Est);
-	%-define(Est,   {"alsace", "franche-comte", "lorraine"}).
+% A LA MER
+parse({"a", "la", Lieu_geographique}) when Lieu_geographique =:= "mer" -> 
+	Mer = {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"},
+	region_ToBoundingBox(Mer);
+%	"alsace", "aquitaine", "bourgogne", "bretagne", "centre", 
+%	"franche-comte", "ile-de-france", "languedoc-roussillon", 
+%	"lorraine", "midi-pyrenees", "nord-pas-de-calais", 
+%	"pays-de-la-loire", "provence-alpes-cotes-d'azur",
+%	"rhone-alpes"
+
+% A LA MONTAGNE
+parse({"a", "la", Lieu_geographique}) when Lieu_geographique =:= "montagne" -> 
+	Montagne = {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"},
+	region_ToBoundingBox(Montagne);
 
 parse(_) -> 
 	"Oops! Something went wrong, please try again".

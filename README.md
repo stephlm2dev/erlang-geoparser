@@ -5,8 +5,9 @@ A localisation parser made in Erlang
 
 Gère actuellement : 
 - a VILLE/REGION précise
-- points cardinaux
+- dans l'/le points cardinaux
 - à la mer/à la montagne
+- au bord de la mer
 
 ## How it works
 ### Compilation

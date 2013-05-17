@@ -130,31 +130,42 @@ analyser(Lieu) when ?is_string(Lieu) ->
 	Answer = is_integer_inTuple(List_Lieu),
 	if (Answer =:= true) -> "Oops! Something went wrong, please try again";
 		true -> 
+			New_List_Lieu = minuscule_Tuple(List_Lieu),
 			case tuple_size(List_Lieu) of
-				2 -> 
-					New_List_Lieu = minuscule_Tuple(List_Lieu),
-					{Preposition, Zone} = New_List_Lieu,
-					case Preposition of
-						"a" -> % si ville ou une région
-							Pos_ville     = is_in_Tuple(?Ville, Zone),
-							Pos_region    = is_in_Tuple(?Region, Zone),
-							if  Pos_ville  =/= 0 -> parse({Pos_ville,  ?Coordonnees_Villes});
-								Pos_region =/= 0 -> parse({Pos_region, ?Coordonnees_Regions});
-								true -> "Oops! Something went wrong, please try again"
-							end;		
-						"dans" -> % dans l'ouest ou dans l'est
-							parse({"dans", Zone});
-						_ -> "Oops! Something went wrong, please try again"
-					end;
-				3 -> % dans le sud / dans le nord
-					New_List_Lieu = minuscule_Tuple(List_Lieu),
-					{Preposition,_, Zone} = New_List_Lieu,
-					case Preposition of
-						"a"    -> parse({"a", "la", Zone});
-						"dans" -> parse({"dans", "le", Zone})
-					end;
-				_ -> "Oops! Something went wrong, please try again"
-			end
+				2 -> % ville / region / dans l'est / dans l'ouest
+					{Preposition, Zone} = New_List_Lieu; 
+				3 -> % dans le sud / dans le nord / a la mer / a la montagne
+					{Mot1, Mot2, Mot3} = New_List_Lieu,
+					Preposition = string:concat(Mot1, " " ++ Mot2),
+					Zone = Mot3;	
+				5 -> % au bord de la mer 
+					{Mot1, Mot2, Mot3, Mot4, Mot5} = New_List_Lieu,
+					Concatenation_1 = string:concat(Mot1, " " ++ Mot2),
+					Concatenation_2 = string:concat(" " ++ Mot3, " " ++ Mot4),
+					Preposition = string:concat(Concatenation_1, Concatenation_2),
+					Zone = Mot5;
+				_ -> New_List_Lieu = {}, 
+					{Preposition,_, Zone} = {false, false,false}
+			end,
+
+		if(Preposition =:= false) -> "Oops! Something went wrong, please try again";
+			true -> 
+				case Preposition of
+					% si ville ou une région
+					"a" -> 
+						Pos_ville  = is_in_Tuple(?Ville, Zone),
+						Pos_region = is_in_Tuple(?Region, Zone),
+						if  Pos_ville  =/= 0 -> parse({Pos_ville,  ?Coordonnees_Villes});
+							Pos_region =/= 0 -> parse({Pos_region, ?Coordonnees_Regions});
+							true -> "Oops! Something went wrong, please try again"
+						end;
+					"a la"  -> parse({"a la", Zone}); % mer ou montagne
+					"dans"  -> parse({"dans", Zone}); % l'est ou l'ouest
+					"dans le" -> parse({"dans le", Zone}); % nord ou sud
+					"au bord de la" -> parse({"au bord de la", Zone}); % mer
+					_ -> "Oops! Something went wrong, please try again"
+				end
+		end
 	end;
 
 analyser(_) -> 
@@ -181,27 +192,34 @@ parse({"dans", Point_Cardinal}) when Point_Cardinal =:= "l'est" ->
 	% Est : {"alsace", "franche-comte", "lorraine"}
 
 % DANS LE NORD 
-parse({"dans", "le", Point_Cardinal}) when Point_Cardinal =:= "nord" -> 
+parse({"dans le", Point_Cardinal}) when Point_Cardinal =:= "nord" -> 
 	region_ToBoundingBox(?Nord);
 	% Nord : {"nord-pas-de-calais"}
 
 % DANS LE SUD 
-parse({"dans", "le", Point_Cardinal}) when Point_Cardinal =:= "sud" -> 
+parse({"dans le", Point_Cardinal}) when Point_Cardinal =:= "sud" -> 
 	region_ToBoundingBox(?Sud);
 	% Sud : {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % A LA MER
-parse({"a", "la", Lieu_geographique}) when Lieu_geographique =:= "mer" -> 
+parse({"a la", Lieu_geographique}) when Lieu_geographique =:= "mer" -> 
 	Mer = {"aquitaine", "bretagne", "languedoc-roussillon", "midi-pyrenees", 
  		   "nord-pas-de-calais", "pays-de-la-loire", "provence-alpes-cotes-d'azur"},
 	region_ToBoundingBox(Mer);
+
 % A LA MONTAGNE
-parse({"a", "la", Lieu_geographique}) when Lieu_geographique =:= "montagne" -> 
+parse({"a la", Lieu_geographique}) when Lieu_geographique =:= "montagne" -> 
 	Montagne = {"alsace", "aquitaine", "centre", "franche-comte", 
 				"languedoc-roussillon", "lorraine", "midi-pyrenees", "rhone-alpes"},
 	region_ToBoundingBox(Montagne);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% AU BORD DE LA MER
+parse({"au bord de la", Zone}) when Zone =:= "mer" -> 
+	parse({"a la", "mer"});
 
 parse(_) -> 
 	"Oops! Something went wrong, please try again".
@@ -254,4 +272,4 @@ region_ToBoundingBox(Tuple, N, Size, New) when N < Size ->
 	Nouvel_Element = element(Position, ?Coordonnees_Regions),
 	region_ToBoundingBox(Tuple, N+1, Size, lists:append(New, [Nouvel_Element]));
 
-region_ToBoundingBox(_,_,_,New) -> list_to_tuple(New).
+region_ToBoundingBox(_,_,_,New) -> list_to_tuple(New).	

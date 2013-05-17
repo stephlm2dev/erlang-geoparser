@@ -1,6 +1,6 @@
 -module (geo_parser).
 -author("Schmidely Stephane").
--vsn(0.1).
+-vsn(1.0).
 -import (string, [tokens/2, to_lower/1]).
 -export ([analyser/1]).
 
@@ -61,7 +61,6 @@
 -define(Sud,   {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"}).
 -define(Ouest, {"bretagne", "pays-de-la-loire"}).
 -define(Est,   {"alsace", "franche-comte", "lorraine"}).
-
 
 % paris         left =2.224199; bottm=48.815573;    right=2.469921; top=48.902145
 
@@ -132,34 +131,26 @@ analyser(Lieu) when ?is_string(Lieu) ->
 	if (Answer =:= true) -> "Oops! Something went wrong, please try again";
 		true -> 
 			New_List_Lieu = minuscule_Tuple(List_Lieu),
-			case tuple_size(List_Lieu) of
-				2 -> % ville / region / dans l'est / dans l'ouest
-					{Preposition, Zone} = New_List_Lieu; 
-				3 -> % dans le sud / dans le nord / a la mer / a la montagne
+			Taille_tuple = tuple_size(List_Lieu),
+			% ville / region / dans l'est / dans l'ouest
+			if (Taille_tuple =:= 2) -> {Preposition, Zone} = New_List_Lieu; 
+			   (Taille_tuple > 2 andalso Taille_tuple < 6) ->
+				% dans le sud / dans le nord / a la mer / a la montagne
+				% a cote de / au bord de la mer 
 					{Preposition, Zone} = normalize_Tuple(New_List_Lieu);
-				5 -> % au bord de la mer 
-					{Preposition, Zone} = normalize_Tuple(New_List_Lieu);
-				_ -> New_List_Lieu = {}, 
-					{Preposition, Zone} = {false, false}
+				true -> {Preposition, Zone} = {false, false}
 			end,
 
 		if(Preposition =:= false) -> "Oops! Something went wrong, please try again";
 			true -> 
 				case Preposition of
-					% si ville ou une région
-					"a" -> 
-						Pos_ville  = is_in_Tuple(?Ville, Zone),
-						if  Pos_ville  =/= 0 -> parse({Pos_ville,  ?Coordonnees_Villes});
-							true -> "Oops! Something went wrong, please try again"
-						end;
-					"en" -> 
-						Pos_region = is_in_Tuple(?Region, Zone),
-						if  Pos_region =/= 0 -> parse({Pos_region, ?Coordonnees_Regions});
-							true -> "Oops! Something went wrong, please try again"
-						end;
+					"a" -> parse({"a", Zone}); % a VILLE
+					"en" -> parse({"en", Zone}); % en REGION
 					"a la"  -> parse({"a la", Zone}); % mer ou montagne
 					"dans"  -> parse({"dans", Zone}); % l'est ou l'ouest
 					"dans le" -> parse({"dans le", Zone}); % nord ou sud
+					"a cote de" -> parse({"a cote de", Zone}); % a cote de VILLE
+					"autour de" -> parse({"autour de", Zone}); % autour de VILLE
 					"au bord de la" -> parse({"au bord de la", Zone}); % mer
 					_ -> "Oops! Something went wrong, please try again"
 				end
@@ -173,9 +164,21 @@ analyser(_) ->
 %							FONCTIONS PARSE 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% VILLES ET REGIONS
-parse({Position, Type_Lieu}) when ?is_positif(Position) ->
-	element(Position, Type_Lieu);
+% A VILLE
+parse({"a", Zone}) -> 
+	Pos_ville  = is_in_Tuple(?Ville, Zone),
+	if  Pos_ville  =/= 0 -> element(Pos_ville,  ?Coordonnees_Villes);
+		true -> "Oops! Something went wrong, please try again"
+	end;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% EN REGION
+parse({"en", Zone}) -> 
+	Pos_region = is_in_Tuple(?Region, Zone),
+	if  Pos_region =/= 0 -> element(Pos_region,  ?Coordonnees_Regions);
+		true -> "Oops! Something went wrong, please try again"
+	end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -218,6 +221,18 @@ parse({"a la", Lieu_geographique}) when Lieu_geographique =:= "montagne" ->
 % AU BORD DE LA MER
 parse({"au bord de la", Zone}) when Zone =:= "mer" -> 
 	parse({"a la", "mer"});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% AUTOUR DE VILLE
+parse({"autour de", Zone}) -> 
+	parse({"a", Zone});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% A COTE DE VILLE
+parse({"a cote de", Zone}) -> 
+	parse({"a", Zone});
 
 parse(_) -> 
 	"Oops! Something went wrong, please try again".

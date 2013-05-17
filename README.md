@@ -4,10 +4,13 @@ Erlang-geoparser
 A localisation parser made in Erlang
 
 Gère actuellement : 
-- a VILLE/REGION précise
+- a VILLE précise
+- en REGION précise
 - dans l'/le points cardinaux
 - à la mer/à la montagne
 - au bord de la mer
+- a cote de VILLE
+- autour de VILLE
 
 ## How it works
 ### Compilation

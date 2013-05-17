@@ -194,17 +194,13 @@ parse({"dans", "le", Point_Cardinal}) when Point_Cardinal =:= "sud" ->
 
 % A LA MER
 parse({"a", "la", Lieu_geographique}) when Lieu_geographique =:= "mer" -> 
-	Mer = {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"},
+	Mer = {"aquitaine", "bretagne", "languedoc-roussillon", "midi-pyrenees", 
+ 		   "nord-pas-de-calais", "pays-de-la-loire", "provence-alpes-cotes-d'azur"},
 	region_ToBoundingBox(Mer);
-%	"alsace", "aquitaine", "bourgogne", "bretagne", "centre", 
-%	"franche-comte", "ile-de-france", "languedoc-roussillon", 
-%	"lorraine", "midi-pyrenees", "nord-pas-de-calais", 
-%	"pays-de-la-loire", "provence-alpes-cotes-d'azur",
-%	"rhone-alpes"
-
 % A LA MONTAGNE
 parse({"a", "la", Lieu_geographique}) when Lieu_geographique =:= "montagne" -> 
-	Montagne = {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"},
+	Montagne = {"alsace", "aquitaine", "centre", "franche-comte", 
+				"languedoc-roussillon", "lorraine", "midi-pyrenees", "rhone-alpes"},
 	region_ToBoundingBox(Montagne);
 
 parse(_) -> 

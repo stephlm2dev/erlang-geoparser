@@ -10,6 +10,7 @@
 				"lille", "lyon", "marseille", "metz", "montpelliez", "nancy", 
 				"nantes", "nice", "paris", "perpignan", "rennes", "rouen", 
 				"strasbourg", "toulouse", "vannes"}).
+
 -define(Coordonnees_Villes, {
 	{5.941030 , 47.208752, 6.065190 , 47.274250},
 	{0.643330 , 44.808201, -0.528030, 44.919491},
@@ -135,17 +136,11 @@ analyser(Lieu) when ?is_string(Lieu) ->
 				2 -> % ville / region / dans l'est / dans l'ouest
 					{Preposition, Zone} = New_List_Lieu; 
 				3 -> % dans le sud / dans le nord / a la mer / a la montagne
-					{Mot1, Mot2, Mot3} = New_List_Lieu,
-					Preposition = string:concat(Mot1, " " ++ Mot2),
-					Zone = Mot3;	
+					{Preposition, Zone} = normalize_Tuple(New_List_Lieu);
 				5 -> % au bord de la mer 
-					{Mot1, Mot2, Mot3, Mot4, Mot5} = New_List_Lieu,
-					Concatenation_1 = string:concat(Mot1, " " ++ Mot2),
-					Concatenation_2 = string:concat(" " ++ Mot3, " " ++ Mot4),
-					Preposition = string:concat(Concatenation_1, Concatenation_2),
-					Zone = Mot5;
+					{Preposition, Zone} = normalize_Tuple(New_List_Lieu);
 				_ -> New_List_Lieu = {}, 
-					{Preposition,_, Zone} = {false, false,false}
+					{Preposition, Zone} = {false, false}
 			end,
 
 		if(Preposition =:= false) -> "Oops! Something went wrong, please try again";
@@ -154,9 +149,12 @@ analyser(Lieu) when ?is_string(Lieu) ->
 					% si ville ou une région
 					"a" -> 
 						Pos_ville  = is_in_Tuple(?Ville, Zone),
-						Pos_region = is_in_Tuple(?Region, Zone),
 						if  Pos_ville  =/= 0 -> parse({Pos_ville,  ?Coordonnees_Villes});
-							Pos_region =/= 0 -> parse({Pos_region, ?Coordonnees_Regions});
+							true -> "Oops! Something went wrong, please try again"
+						end;
+					"en" -> 
+						Pos_region = is_in_Tuple(?Region, Zone),
+						if  Pos_region =/= 0 -> parse({Pos_region, ?Coordonnees_Regions});
 							true -> "Oops! Something went wrong, please try again"
 						end;
 					"a la"  -> parse({"a la", Zone}); % mer ou montagne
@@ -273,3 +271,15 @@ region_ToBoundingBox(Tuple, N, Size, New) when N < Size ->
 	region_ToBoundingBox(Tuple, N+1, Size, lists:append(New, [Nouvel_Element]));
 
 region_ToBoundingBox(_,_,_,New) -> list_to_tuple(New).	
+
+% convertie un tuple explicite en un tuple {Preposition, Zone}
+
+normalize_Tuple(Tuple) -> normalize_Tuple(Tuple, 1, tuple_size(Tuple), "").
+
+normalize_Tuple(Tuple, N, Size, New) when N < Size -> 
+	if (New =:= "") -> Mot = element(1, Tuple);
+		true -> Mot = string:concat(New, " " ++ element(N, Tuple))
+	end,
+	normalize_Tuple(Tuple, N+1, Size, Mot);
+
+normalize_Tuple(Tuple,_,Size,New) -> {New, element(Size, Tuple)}.

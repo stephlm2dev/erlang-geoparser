@@ -1,10 +1,10 @@
 -module (geo_parser).
 -author("Schmidely Stephane").
 -vsn(1.0).
--import (string, [tokens/2, to_lower/1]).
 -export ([analyser/1]).
+-export([start/2, stop/1]).
+-behaviour (application).
 
--define(is_string(X),(is_list(X))).
 -define(is_positif(X), (is_integer(X) andalso X > 0)).
 -define(Ville, {"besancon", "bordeaux", "caen", "dijon", "la rochelle",
 				"lille", "lyon", "marseille", "metz", "montpelliez", "nancy", 
@@ -125,10 +125,13 @@
 %							FONCTION PRINCIPALE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-analyser(Lieu) when ?is_string(Lieu) ->
-	List_Lieu = list_to_tuple(tokens(Lieu, " ")),
+start(_StartType, _StartArgs) -> ok.
+stop(_State)-> ok.
+
+analyser(Lieu) when is_list(Lieu) ->
+	List_Lieu = list_to_tuple(string:tokens(Lieu, " ")),
 	Answer = is_integer_inTuple(List_Lieu),
-	if (Answer =:= true) -> "Oops! Something went wrong, please try again";
+	if (Answer =:= true) -> {error, contain_integer};
 		true -> 
 			New_List_Lieu = minuscule_Tuple(List_Lieu),
 			Taille_tuple = tuple_size(List_Lieu),
@@ -141,7 +144,7 @@ analyser(Lieu) when ?is_string(Lieu) ->
 				true -> {Preposition, Zone} = {false, false}
 			end,
 
-		if(Preposition =:= false) -> "Oops! Something went wrong, please try again";
+		if(Preposition =:= false) -> {error, not_matching};
 			true -> 
 				case Preposition of
 					"a" -> parse({"a", Zone}); % a VILLE
@@ -152,13 +155,13 @@ analyser(Lieu) when ?is_string(Lieu) ->
 					"a cote de" -> parse({"a cote de", Zone}); % a cote de VILLE
 					"autour de" -> parse({"autour de", Zone}); % autour de VILLE
 					"au bord de la" -> parse({"au bord de la", Zone}); % mer
-					_ -> "Oops! Something went wrong, please try again"
+					_ -> {error, not_matching}
 				end
 		end
 	end;
 
 analyser(_) -> 
-	"Oops! Something went wrong, please try again".
+	{error, not_string}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %							FONCTIONS PARSE 
@@ -168,7 +171,7 @@ analyser(_) ->
 parse({"a", Zone}) -> 
 	Pos_ville  = is_in_Tuple(?Ville, Zone),
 	if  Pos_ville  =/= 0 -> element(Pos_ville,  ?Coordonnees_Villes);
-		true -> "Oops! Something went wrong, please try again"
+		true -> {error, unknown_town}
 	end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -177,7 +180,7 @@ parse({"a", Zone}) ->
 parse({"en", Zone}) -> 
 	Pos_region = is_in_Tuple(?Region, Zone),
 	if  Pos_region =/= 0 -> element(Pos_region,  ?Coordonnees_Regions);
-		true -> "Oops! Something went wrong, please try again"
+		true -> {error, unknown_region}
 	end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -234,8 +237,8 @@ parse({"autour de", Zone}) ->
 parse({"a cote de", Zone}) -> 
 	parse({"a", Zone});
 
-parse(_) -> 
-	"Oops! Something went wrong, please try again".
+parse(_) ->
+	{error, not_matching}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %							FONCTIONS ANNEXES 

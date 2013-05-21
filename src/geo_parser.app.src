@@ -1,0 +1,11 @@
+{application, geo_parser,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  stdlib
+                 ]},
+  {mod, { geo_parser, []}},
+  {env, []}
+ ]}.

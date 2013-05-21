@@ -13,7 +13,7 @@ parse_test() ->
 		{"a Paris",				?assert({2.086790, 48.658291, 2.637910, 49.046940}  =:= geo_parser:analyser("a Paris"))}, 
 		{"en AlsAce",	 		?assert({6.841000, 47.420521, 8.232620,  49.077911} =:= geo_parser:analyser("en AlsAce"))},
 		{"autour de Marseille", ?assert({5.290060, 43.192768, 5.568580, 43.420399}  =:= geo_parser:analyser("autour de Marseille"))},
-		{"a cote de Nice", 		?assert({7.199050, 43.657860, 7.319330, 43.741329}  =:= geo_parser:analyser("samedi"))},
+		{"a cote de Nice", 		?assert({7.199050, 43.657860, 7.319330, 43.741329}  =:= geo_parser:analyser("a cote de Nice"))},
 		{"dAnS le NorD",	 	?assert({{1.55536,49.969059,4.23093,51.089062}}     =:= geo_parser:analyser("dAnS le NorD"))},
 		{"dans l'ouest",		?assert({{1.6535,46.992729,1.69219,47.018871}, {-2.55892,46.266819,0.91664,48.567989}}
 											=:= geo_parser:analyser("dans l'ouest"))},
@@ -34,5 +34,5 @@ parse_test() ->
 		{"au bord de la MER",	?assert({{-1.78878,42.777729,1.44827,45.714581}, {1.6535,46.992729,1.69219,47.018871},
 										{1.68839,42.332272,4.84517,44.975811}, {-0.32716,42.571651,3.4515,45.046719},
 										{1.55536,49.969059,4.23093,51.089062}, {-2.55892,46.266819,0.91664,48.567989},
-										{4.2272,43.159821,7.07782,45.126492}} =:= geo_parser:analyser("au bord de la MER"))},
+										{4.2272,43.159821,7.07782,45.126492}} =:= geo_parser:analyser("au bord de la MER"))}
 	].

@@ -11,6 +11,7 @@
 parse_test() -> 
 	[
 		{"a Paris",				?assert({2.086790, 48.658291, 2.637910, 49.046940}  =:= geo_parser:analyser("a Paris"))}, 
+		{"pres de Paris",		?assert({2.086790, 48.658291, 2.637910, 49.046940}  =:= geo_parser:analyser("pres de Paris"))}, 
 		{"en AlsAce",	 		?assert({6.841000, 47.420521, 8.232620,  49.077911} =:= geo_parser:analyser("en AlsAce"))},
 		{"autour de Marseille", ?assert({5.290060, 43.192768, 5.568580, 43.420399}  =:= geo_parser:analyser("autour de Marseille"))},
 		{"a cote de Nice", 		?assert({7.199050, 43.657860, 7.319330, 43.741329}  =:= geo_parser:analyser("a cote de Nice"))},

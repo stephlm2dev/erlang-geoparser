@@ -11,6 +11,7 @@ Gère actuellement :
 - au bord de la mer
 - a cote de VILLE
 - autour de VILLE
+- pres de VILLE
 
 ## How it works
 ### Compilation

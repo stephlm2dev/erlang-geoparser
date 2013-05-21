@@ -151,6 +151,7 @@ analyser(Lieu) when is_list(Lieu) ->
 					"en" -> parse({"en", Zone}); % en REGION
 					"a la"  -> parse({"a la", Zone}); % mer ou montagne
 					"dans"  -> parse({"dans", Zone}); % l'est ou l'ouest
+					"pres de" -> parse({"pres de", Zone}); % pres de VILLE
 					"dans le" -> parse({"dans le", Zone}); % nord ou sud
 					"a cote de" -> parse({"a cote de", Zone}); % a cote de VILLE
 					"autour de" -> parse({"autour de", Zone}); % autour de VILLE
@@ -224,6 +225,12 @@ parse({"a la", Lieu_geographique}) when Lieu_geographique =:= "montagne" ->
 % AU BORD DE LA MER
 parse({"au bord de la", Zone}) when Zone =:= "mer" -> 
 	parse({"a la", "mer"});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% PRES DE VILLE
+parse({"pres de", Zone}) -> 
+	parse({"a", Zone});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

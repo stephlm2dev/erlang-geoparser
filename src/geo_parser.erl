@@ -162,18 +162,18 @@ analyser(Lieu) when is_list(Lieu) ->
 					"au sud de"       -> parse({"au sud de", Zone});
 					"a l'est de"      -> parse({"a l'est de", Zone});
 					"a l'ouest de"    -> parse({"a l'ouest de", Zone});
-					"au nord de la"   -> parse({"au nord de la", Zone});
 					"au sud de la"    -> parse({"au sud de la", Zone}); 
+					"au nord de la"   -> parse({"au nord de la", Zone});
 					"a l'est de la"   -> parse({"a l'est de la", Zone});
 					"a l'ouest de la" -> parse({"a l'ouest de la", Zone});
 					"au nord des"	  -> parse({"au nord des", Zone});
-					"au nord du"	  -> parse({"au nord du", Zone});
-					"au sud des"	  -> parse({"au sud des", Zone});
 					"au sud du"		  -> parse({"au sud du", Zone});
-					"a l'est des"	  -> parse({"a l'est des", Zone});
+					"au sud des"	  -> parse({"au sud des", Zone});
+					"au nord du"	  -> parse({"au nord du", Zone});
 					"a l'est du"	  -> parse({"a l'est du", Zone});
-					"a l'ouest des"	  -> parse({"a l'ouest des", Zone});
+					"a l'est des"	  -> parse({"a l'est des", Zone});
 					"a l'ouest du"	  -> parse({"a l'ouest du", Zone});
+					"a l'ouest des"	  -> parse({"a l'ouest des", Zone});
 					_ -> {error, not_matching}
 				end
 		end
@@ -247,16 +247,19 @@ parse({"au bord de la", Zone}) when Zone =:= "mer" ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % PRES DE VILLE / AUTOUR DE VILLE / A COTE DE VILLE
-parse({Preposition, Zone}) when Preposition =:= "pres de" orelse Preposition =:= "autour de" 
-						   orelse Preposition =:= "a cote de" -> 
+parse({Preposition, Zone}) when Preposition =:= "pres de" orelse 
+								Preposition =:= "autour de" orelse
+								Preposition =:= "a cote de" -> 
 	parse({"a", Zone});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % AU NORD DE VILLE / AU NORD DE L'REGION / AU SUD DE VILLE / 
 % A L'EST DE VILLE / A L'OUEST DE VILLE
-parse({Preposition, Zone}) when Preposition =:= "au nord de" orelse Preposition =:= "au sud de" orelse
-								Preposition =:= "a l'est de" orelse Preposition =:= "a l'ouest de" ->
+parse({Preposition, Zone}) when Preposition =:= "au nord de" orelse 
+								Preposition =:= "au sud de" orelse 
+								Preposition =:= "a l'est de" orelse
+								Preposition =:= "a l'ouest de" ->
 	Pos_element = is_in_Tuple(?Region_speciale, Zone),
 	if (Pos_element =:= 0) -> parse({"a", Zone});
 		true -> 
@@ -302,7 +305,6 @@ parse({Preposition, Zone}) ->
 
 parse(_) ->
 	{error, not_matching}.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %							FONCTIONS ANNEXES 
@@ -359,8 +361,9 @@ region_ToBoundingBox(Tuple, N, Size, New) when N < Size ->
 
 region_ToBoundingBox(_,_,_,New) -> list_to_tuple(New).	
 
-% convertie un tuple explicite en un tuple {Preposition, Zone}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% convertie un tuple explicite en un tuple {Preposition, Zone}
 normalize_Tuple(Tuple) -> normalize_Tuple(Tuple, 1, tuple_size(Tuple), "").
 
 normalize_Tuple(Tuple, N, Size, New) when N < Size -> 

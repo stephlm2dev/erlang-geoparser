@@ -6,12 +6,13 @@ A localisation parser made in Erlang
 Gère actuellement : 
 - a VILLE précise
 - en REGION précise
-- dans l'/le points cardinaux
-- à la mer/à la montagne
+- dans l'/le POINT_CARDINAL
+- a la mer/à la montagne
 - au bord de la mer
 - a cote de VILLE
 - autour de VILLE
 - pres de VILLE
+- a/au POINT_CARDINAL de/du/des VILLE/REGION  
 
 ## How it works
 ### Compilation

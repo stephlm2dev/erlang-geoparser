@@ -277,47 +277,28 @@ parse({Preposition, Zone}) when Preposition =:= "au nord de" orelse Preposition 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% AU NORD DE LA REGION
-parse({"au nord de la", Zone}) ->
-	parse({"en", Zone});
-
-parse({"au nord des", Zone}) ->
-	parse({"en", Zone});
-
-parse({"au nord du", Zone}) ->
-	parse({"en", Zone});
-
-% AU SUD DE LA REGION
-parse({"au sud de la", Zone}) ->
-	parse({"en", Zone});
-
-parse({"au sud des", Zone}) ->
-	parse({"en", Zone});
-
-parse({"au sud du", Zone}) ->
-	parse({"en", Zone});
-
-% A L'EST DE LA REGION
-parse({"a l'est de la", Zone}) ->
-	parse({"en", Zone});
-
-parse({"a l'est des", Zone}) ->
-	parse({"en", Zone});
-
-parse({"a l'est du", Zone}) ->
-	parse({"en", Zone});
-
-% A L'OUEST DE LA REGION
-parse({"a l'ouest de la", Zone}) ->
-	parse({"en", Zone});
-
-parse({"a l'ouest des", Zone}) ->
-	parse({"en", Zone});
-
-parse({"a l'ouest du", Zone}) ->
-	parse({"en", Zone});
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% AU NORD DE LA REGION / AU SUD DE LA REGION / A L'EST DE LA REGION / A L'OUEST DE LA REGION
+parse({Preposition, Zone}) ->
+	Pos_element = is_in_Tuple(?Region, Zone),
+	if (Pos_element =:= 1 orelse Pos_element =:= 2 orelse Pos_element =:= 7) -> {error, not_french};
+		true -> 
+			case Preposition of
+				"au nord de la"   -> parse({"en", Zone});
+				"au nord des"     -> parse({"en", Zone});
+				"au nord du"      -> parse({"en", Zone});
+				"au sud de la"    -> parse({"en", Zone});
+				"au sud des"      -> parse({"en", Zone});
+				"au sud du"       -> parse({"en", Zone});
+				"a l'est de la"   -> parse({"en", Zone});
+				"a l'est des"     -> parse({"en", Zone});
+				"a l'est du"      -> parse({"en", Zone});
+				"a l'ouest de la" -> parse({"en", Zone});
+				"a l'ouest des"   -> parse({"en", Zone});
+				"a l'ouest du"    -> parse({"en", Zone});
+				_ -> {error, not_matching}
+		end
+	end;
+	
 
 parse(_) ->
 	{error, not_matching}.

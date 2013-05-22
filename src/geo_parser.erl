@@ -38,6 +38,7 @@
 				 "lorraine", "midi-pyrenees", "nord-pas-de-calais", 
 				 "pays-de-la-loire", "provence-alpes-cotes-d'azur",
 				 "rhone-alpes"}).
+-define(Region_speciale, {"l'alsace", "l'aquitaine", "l'ile-de-france"}).
 
 -define(Coordonnees_Regions, {
 	{6.841000 , 47.420521, 8.232620,  49.077911},
@@ -147,15 +148,31 @@ analyser(Lieu) when is_list(Lieu) ->
 		if(Preposition =:= false) -> {error, not_matching};
 			true -> 
 				case Preposition of
-					"a" -> parse({"a", Zone}); % a VILLE
-					"en" -> parse({"en", Zone}); % en REGION
-					"a la"  -> parse({"a la", Zone}); % mer ou montagne
-					"dans"  -> parse({"dans", Zone}); % l'est ou l'ouest
-					"pres de" -> parse({"pres de", Zone}); % pres de VILLE
-					"dans le" -> parse({"dans le", Zone}); % nord ou sud
-					"a cote de" -> parse({"a cote de", Zone}); % a cote de VILLE
-					"autour de" -> parse({"autour de", Zone}); % autour de VILLE
-					"au bord de la" -> parse({"au bord de la", Zone}); % mer
+					"a"               -> parse({"a", Zone}); % a VILLE
+					"en"              -> parse({"en", Zone}); % en REGION
+					"a la"            -> parse({"a la", Zone}); % mer ou montagne
+					"dans"            -> parse({"dans", Zone}); % l'est ou l'ouest
+					"pres de"         -> parse({"pres de", Zone}); % pres de VILLE
+					"dans le"         -> parse({"dans le", Zone}); % nord ou sud
+					"a cote de"       -> parse({"a cote de", Zone}); % a cote de VILLE
+					"autour de"       -> parse({"autour de", Zone}); % autour de VILLE
+					"au bord de la"   -> parse({"au bord de la", Zone}); % mer
+					"au nord de"      -> parse({"au nord de", Zone});
+					"au sud de"       -> parse({"au sud de", Zone});
+					"a l'est de"      -> parse({"a l'est de", Zone});
+					"a l'ouest de"    -> parse({"a l'ouest de", Zone});
+					"au nord de la"   -> parse({"au nord de la", Zone});
+					"au sud de la"    -> parse({"au sud de la", Zone}); 
+					"a l'est de la"   -> parse({"a l'est de la", Zone});
+					"a l'ouest de la" -> parse({"a l'ouest de la", Zone});
+					"au nord des"	  -> parse({"au nord des", Zone});
+					"au nord du"	  -> parse({"au nord du", Zone});
+					"au sud des"	  -> parse({"au sud des", Zone});
+					"au sud du"		  -> parse({"au sud du", Zone});
+					"a l'est des"	  -> parse({"a l'est des", Zone});
+					"a l'est du"	  -> parse({"a l'est du", Zone});
+					"a l'ouest des"	  -> parse({"a l'ouest des", Zone});
+					"a l'ouest du"	  -> parse({"a l'ouest du", Zone});
 					_ -> {error, not_matching}
 				end
 		end
@@ -243,6 +260,64 @@ parse({"autour de", Zone}) ->
 % A COTE DE VILLE
 parse({"a cote de", Zone}) -> 
 	parse({"a", Zone});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% AU NORD DE VILLE / AU NORD DE L'REGION / AU SUD DE VILLE / 
+% A L'EST DE VILLE / A L'OUEST DE VILLE
+parse({Preposition, Zone}) when Preposition =:= "au nord de" orelse Preposition =:= "au sud de" orelse
+								Preposition =:= "a l'est de" orelse Preposition =:= "a l'ouest de" ->
+	Pos_element = is_in_Tuple(?Region_speciale, Zone),
+	if (Pos_element =:= 0) -> parse({"a", Zone});
+		true -> 
+			if (Pos_element =:= 3) -> parse({"en", element(7, ?Region)});
+			 	true -> parse({"en", element(Pos_element, ?Region)})
+			end
+	end;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% AU NORD DE LA REGION
+parse({"au nord de la", Zone}) ->
+	parse({"en", Zone});
+
+parse({"au nord des", Zone}) ->
+	parse({"en", Zone});
+
+parse({"au nord du", Zone}) ->
+	parse({"en", Zone});
+
+% AU SUD DE LA REGION
+parse({"au sud de la", Zone}) ->
+	parse({"en", Zone});
+
+parse({"au sud des", Zone}) ->
+	parse({"en", Zone});
+
+parse({"au sud du", Zone}) ->
+	parse({"en", Zone});
+
+% A L'EST DE LA REGION
+parse({"a l'est de la", Zone}) ->
+	parse({"en", Zone});
+
+parse({"a l'est des", Zone}) ->
+	parse({"en", Zone});
+
+parse({"a l'est du", Zone}) ->
+	parse({"en", Zone});
+
+% A L'OUEST DE LA REGION
+parse({"a l'ouest de la", Zone}) ->
+	parse({"en", Zone});
+
+parse({"a l'ouest des", Zone}) ->
+	parse({"en", Zone});
+
+parse({"a l'ouest du", Zone}) ->
+	parse({"en", Zone});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 parse(_) ->
 	{error, not_matching}.

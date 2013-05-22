@@ -18,9 +18,9 @@ Gère actuellement :
 ### Compilation
 1> c(geo_parser).
 ### Requête
-2> geo_parser:analyser("your_search_between_quotes").
+2> geo_parser:analyser("your_search_between_quotes", Analyzed).
 ### Valeur de retour 
-Bounding box sous forme {X1, Y1, X2, Y2}
+[list_analyzed,{lieu,{X1, Y1, X2, Y2}}]
 
 ## Exemple d'utilisation 
 

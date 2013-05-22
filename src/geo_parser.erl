@@ -15,22 +15,22 @@
 	{5.941030 , 47.208752, 6.065190 , 47.274250},
 	{0.643330 , 44.808201, -0.528030, 44.919491},
 	{-0.418990, 49.147480, -0.318410, 49.217770},
-	{4.987000, 47.277100, 5.082540 , 47.360401} ,
+	{4.987000 , 47.277100, 5.082540 , 47.360401},
 	{-1.228850, 46.137291, -1.100650, 46.179859},
-	{2.957110 , 50.573502, 3.179220 , 50.695110} ,
+	{2.957110 , 50.573502, 3.179220 , 50.695110},
 	{4.768930 , 45.704479, 4.901690 , 45.808578},
-	{5.290060, 43.192768, 5.568580 , 43.420399},
-	{6.117290, 49.073479, 6.256330 , 49.164261},
-	{3.808790, 43.570599, 3.926250 , 43.652279},
+	{5.290060 , 43.192768, 5.568580 , 43.420399},
+	{6.117290 , 49.073479, 6.256330 , 49.164261},
+	{3.808790 , 43.570599, 3.926250 , 43.652279},
 	{6.134120 , 48.666950, 6.209060 , 48.709251},
 	{-1.650890, 47.168671, -1.477230, 47.294270},
 	{7.199050 , 43.657860, 7.319330 , 43.741329},
 	{2.086790 , 48.658291, 2.637910 , 49.046940},
-	{2.853150, 42.665379, 2.936420 , 42.747700},
+	{2.853150 , 42.665379, 2.936420 , 42.747700},
 	{-1.759150, 48.056831, -1.592190, 48.150749},
-	{1.002850, 49.334671, 1.157690 , 49.489231} ,
+	{1.002850 , 49.334671, 1.157690 , 49.489231},
 	{7.687340 , 48.495628, 7.827470 , 48.640709},
-	{1.356110, 43.538830, 1.504430 , 43.669842},
+	{1.356110 , 43.538830, 1.504430 , 43.669842},
 	{-2.798740, 47.632038, -2.693290, 47.683498}}).
 
 -define(Region, {"alsace", "aquitaine", "bourgogne", "bretagne", "centre", 
@@ -38,6 +38,7 @@
 				 "lorraine", "midi-pyrenees", "nord-pas-de-calais", 
 				 "pays-de-la-loire", "provence-alpes-cotes-d'azur",
 				 "rhone-alpes"}).
+
 -define(Region_speciale, {"l'alsace", "l'aquitaine", "l'ile-de-france"}).
 
 -define(Coordonnees_Regions, {
@@ -245,20 +246,9 @@ parse({"au bord de la", Zone}) when Zone =:= "mer" ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% PRES DE VILLE
-parse({"pres de", Zone}) -> 
-	parse({"a", Zone});
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% AUTOUR DE VILLE
-parse({"autour de", Zone}) -> 
-	parse({"a", Zone});
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% A COTE DE VILLE
-parse({"a cote de", Zone}) -> 
+% PRES DE VILLE / AUTOUR DE VILLE / A COTE DE VILLE
+parse({Preposition, Zone}) when Preposition =:= "pres de" orelse Preposition =:= "autour de" 
+						   orelse Preposition =:= "a cote de" -> 
 	parse({"a", Zone});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -280,28 +270,39 @@ parse({Preposition, Zone}) when Preposition =:= "au nord de" orelse Preposition 
 % AU NORD DE LA REGION / AU SUD DE LA REGION / A L'EST DE LA REGION / A L'OUEST DE LA REGION
 parse({Preposition, Zone}) ->
 	Pos_element = is_in_Tuple(?Region, Zone),
-	if (Pos_element =:= 1 orelse Pos_element =:= 2 orelse Pos_element =:= 7) -> {error, not_french};
+	if (Pos_element =:= 0) -> Mot = "unknown_region";
 		true -> 
+			case Pos_element of
+				N when (N =:=  1 orelse N =:=  2 orelse N =:=  7) -> Mot = "not_french";
+				N when (N =:= 10 orelse N =:= 12 orelse N =:= 14) -> Mot = "des";
+				N when (N =:=  5 orelse N =:=  8 orelse N =:= 11) -> Mot = "du";
+				_ -> Mot = "la"
+			end
+	end,
+	
+	Pos_mot = is_in_Tuple({"not_french", "unknown_region"}, Mot),
+	if (Pos_mot > 0) -> {error, list_to_atom(Mot)};
+		true ->
 			case Preposition of
-				"au nord de la"   -> parse({"en", Zone});
-				"au nord des"     -> parse({"en", Zone});
-				"au nord du"      -> parse({"en", Zone});
-				"au sud de la"    -> parse({"en", Zone});
-				"au sud des"      -> parse({"en", Zone});
-				"au sud du"       -> parse({"en", Zone});
-				"a l'est de la"   -> parse({"en", Zone});
-				"a l'est des"     -> parse({"en", Zone});
-				"a l'est du"      -> parse({"en", Zone});
-				"a l'ouest de la" -> parse({"en", Zone});
-				"a l'ouest des"   -> parse({"en", Zone});
-				"a l'ouest du"    -> parse({"en", Zone});
-				_ -> {error, not_matching}
+				"au nord de la"   when Mot =:= "la"  -> parse({"en", Zone});
+				"au sud de la"    when Mot =:= "la"  -> parse({"en", Zone});
+				"a l'est de la"   when Mot =:= "la"  -> parse({"en", Zone});
+				"a l'ouest de la" when Mot =:= "la"  -> parse({"en", Zone});
+				"au nord du"      when Mot =:= "du"  -> parse({"en", Zone});
+				"au sud du"       when Mot =:= "du"  -> parse({"en", Zone});
+				"a l'est du"      when Mot =:= "du"  -> parse({"en", Zone});
+				"a l'ouest du"    when Mot =:= "du"  -> parse({"en", Zone});
+				"au nord des"     when Mot =:= "des" -> parse({"en", Zone});
+				"au sud des"      when Mot =:= "des" -> parse({"en", Zone});
+				"a l'est des"     when Mot =:= "des" -> parse({"en", Zone});
+				"a l'ouest des"   when Mot =:= "des" -> parse({"en", Zone});
+				_ -> {error, not_french}
 		end
 	end;
-	
 
 parse(_) ->
 	{error, not_matching}.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %							FONCTIONS ANNEXES 

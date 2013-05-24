@@ -159,19 +159,24 @@ parse({Preposition, Zone, Analyzed}) ->
 	Pos_mot = is_in_Tuple({"not_french", "unknown_region"}, Mot),
 	if (Pos_mot > 0) -> {error, list_to_atom(Mot)};
 		true ->
-			case Preposition of
-				"au nord de la"   when Mot =:= "la"  -> parse({"en", Zone, Analyzed});
-				"au sud de la"    when Mot =:= "la"  -> parse({"en", Zone, Analyzed});
-				"a l'est de la"   when Mot =:= "la"  -> parse({"en", Zone, Analyzed});
-				"a l'ouest de la" when Mot =:= "la"  -> parse({"en", Zone, Analyzed});
-				"au nord du"      when Mot =:= "du"  -> parse({"en", Zone, Analyzed});
-				"au sud du"       when Mot =:= "du"  -> parse({"en", Zone, Analyzed});
-				"a l'est du"      when Mot =:= "du"  -> parse({"en", Zone, Analyzed});
-				"a l'ouest du"    when Mot =:= "du"  -> parse({"en", Zone, Analyzed});
-				"au nord des"     when Mot =:= "des" -> parse({"en", Zone, Analyzed});
-				"au sud des"      when Mot =:= "des" -> parse({"en", Zone, Analyzed});
-				"a l'est des"     when Mot =:= "des" -> parse({"en", Zone, Analyzed});
-				"a l'ouest des"   when Mot =:= "des" -> parse({"en", Zone, Analyzed});
+			case Mot of 
+				"la" when Preposition =:= "au nord de la" orelse 
+						  Preposition =:= "au sud de la" orelse
+						  Preposition =:= "a l'est de la" orelse
+						  Preposition =:= "a l'ouest de la"
+					-> parse({"en", Zone, Analyzed});
+
+				"du" when Preposition =:= "au nord du" orelse 
+						  Preposition =:= "au sud du" orelse
+						  Preposition =:= "a l'est du" orelse
+						  Preposition =:= "a l'ouest du"
+					-> parse({"en", Zone, Analyzed});
+
+				"des" when Preposition =:= "au nord des" orelse 
+						  Preposition =:= "au sud des" orelse
+						  Preposition =:= "a l'est des" orelse
+						  Preposition =:= "a l'ouest des"
+					-> parse({"en", Zone, Analyzed});
 				_ -> {error, not_french}
 		end
 	end;

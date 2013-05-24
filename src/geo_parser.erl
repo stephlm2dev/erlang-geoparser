@@ -58,15 +58,22 @@ parse({"a", Zone, Analyzed}) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% EN REGION
+% EN REGION sauf le nord-pas-de-calais et le centre 
 parse({"en", Zone, Analyzed}) -> 
 	Pos_region = lists:keyfind(Zone, 1, ?Regions),
-	if  Pos_region  =/= false -> lists:append(Analyzed, [{lieu, element(2, Pos_region)}]);
+	if  Pos_region  =/= false andalso element(1, Pos_region) =/= "centre" 
+		andalso element(1, Pos_region) =/= "nord-pas-de-calais"
+				-> lists:append(Analyzed, [{lieu, element(2, Pos_region)}]);
 		true -> {error, unknown_town}
 	end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% DANS LE NORD-PAS-DE-CALAIS ou DANS LE CENTRE
+parse({"dans le", Region, Analyzed}) when Region =:= "nord-pas-de-calais" orelse Region =:= "centre" -> 
+	Pos_region = lists:keyfind(Region, 1, ?Regions),
+	lists:append(Analyzed, [{lieu, element(2, Pos_region)}]);
+	
 % DANS L'OUEST 
 parse({"dans", Point_Cardinal, Analyzed}) when Point_Cardinal =:= "l'ouest" -> 
 	lists:append(Analyzed, [{lieu, region_ToBoundingBox(?Ouest)}]);
@@ -160,7 +167,7 @@ parse({Preposition, Zone, Analyzed}) ->
 	if (Pos_mot > 0) -> {error, list_to_atom(Mot)};
 		true ->
 			case Mot of 
-				"la" when Preposition =:= "au nord de la" orelse 
+				"la" when Preposition =:= "au nord de la" orelse
 						  Preposition =:= "au sud de la" orelse
 						  Preposition =:= "a l'est de la" orelse
 						  Preposition =:= "a l'ouest de la"
@@ -173,9 +180,9 @@ parse({Preposition, Zone, Analyzed}) ->
 					-> parse({"en", Zone, Analyzed});
 
 				"des" when Preposition =:= "au nord des" orelse 
-						  Preposition =:= "au sud des" orelse
-						  Preposition =:= "a l'est des" orelse
-						  Preposition =:= "a l'ouest des"
+						   Preposition =:= "au sud des" orelse
+						   Preposition =:= "a l'est des" orelse
+						   Preposition =:= "a l'ouest des"
 					-> parse({"en", Zone, Analyzed});
 				_ -> {error, not_french}
 		end

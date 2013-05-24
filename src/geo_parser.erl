@@ -73,7 +73,7 @@ parse({"en", Zone, Analyzed}) ->
 parse({"dans le", Region, Analyzed}) when Region =:= "nord-pas-de-calais" orelse Region =:= "centre" -> 
 	Pos_region = lists:keyfind(Region, 1, ?Regions),
 	lists:append(Analyzed, [{lieu, element(2, Pos_region)}]);
-	
+
 % DANS L'OUEST 
 parse({"dans", Point_Cardinal, Analyzed}) when Point_Cardinal =:= "l'ouest" -> 
 	lists:append(Analyzed, [{lieu, region_ToBoundingBox(?Ouest)}]);

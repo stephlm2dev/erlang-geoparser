@@ -38,35 +38,7 @@ analyser(QueryString, Analyzed) when is_list(QueryString) ->
 			end,
 
 		if(Preposition =:= false) -> {error, not_matching};
-			true -> 
-				case Preposition of
-					"a"               -> parse({"a", Zone, Analyzed}); % a VILLE
-					"en"              -> parse({"en", Zone, Analyzed}); % en REGION
-					"a la"            -> parse({"a la", Zone, Analyzed}); % mer ou montagne
-					"dans"            -> parse({"dans", Zone, Analyzed}); % l'est ou l'ouest
-					"pres de"         -> parse({"pres de", Zone, Analyzed}); % pres de VILLE
-					"dans le"         -> parse({"dans le", Zone, Analyzed}); % nord ou sud
-					"a cote de"       -> parse({"a cote de", Zone, Analyzed}); % a cote de VILLE
-					"autour de"       -> parse({"autour de", Zone, Analyzed}); % autour de VILLE
-					"au bord de la"   -> parse({"au bord de la", Zone, Analyzed}); % mer
-					"au nord de"      -> parse({"au nord de", Zone, Analyzed});
-					"au sud de"       -> parse({"au sud de", Zone, Analyzed});
-					"a l'est de"      -> parse({"a l'est de", Zone, Analyzed});
-					"a l'ouest de"    -> parse({"a l'ouest de", Zone, Analyzed});
-					"au sud de la"    -> parse({"au sud de la", Zone, Analyzed}); 
-					"au nord de la"   -> parse({"au nord de la", Zone, Analyzed});
-					"a l'est de la"   -> parse({"a l'est de la", Zone, Analyzed});
-					"a l'ouest de la" -> parse({"a l'ouest de la", Zone, Analyzed});
-					"au nord des"     -> parse({"au nord des", Zone, Analyzed});
-					"au sud du"       -> parse({"au sud du", Zone, Analyzed});
-					"au sud des"      -> parse({"au sud des", Zone, Analyzed});
-					"au nord du"      -> parse({"au nord du", Zone, Analyzed});
-					"a l'est du"      -> parse({"a l'est du", Zone, Analyzed});
-					"a l'est des"     -> parse({"a l'est des", Zone, Analyzed});
-					"a l'ouest du"    -> parse({"a l'ouest du", Zone, Analyzed});
-					"a l'ouest des"   -> parse({"a l'ouest des", Zone, Analyzed});
-					_ -> {error, not_matching}
-				end
+			true -> parse({Preposition, Zone, Analyzed})
 		end
 	end;
 

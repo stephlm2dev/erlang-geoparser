@@ -58,13 +58,21 @@ parse({"a", Zone, Analyzed}) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% EN REGION sauf le nord-pas-de-calais et le centre 
+% EN REGION sauf le nord-pas-de-calais et le centre / EN DEPARTEMENT (certains)
 parse({"en", Zone, Analyzed}) -> 
 	Pos_region = lists:keyfind(Zone, 1, ?Regions),
 	if  Pos_region  =/= false andalso element(1, Pos_region) =/= "centre" 
 		andalso element(1, Pos_region) =/= "nord-pas-de-calais"
 				-> lists:append(Analyzed, [{lieu, element(2, Pos_region)}]);
-		true -> {error, unknown_town}
+		true -> 
+			Special_Departements = {"dordogne", "gironde", "loire-atlantique", "lozere", "vendee", 
+							"meurthe-et-moselle", "moselle", "seine-saint-denis", "saone-et-loire", 
+							"seine-et-marne", "savoie", "haute-garonne", "haute-saone", "haute-savoie"},
+			Exist = is_in_Tuple(Special_Departements, Zone),
+			if (Exist =/= 0) -> 
+				lists:append(Analyzed, [{lieu, element(2, lists:keyfind(Zone, 1, ?Departements))}]);
+				true -> {error, unknown_area}
+			end
 	end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -93,6 +101,63 @@ parse({"dans le", Point_Cardinal, Analyzed}) when Point_Cardinal =:= "nord" ->
 parse({"dans le", Point_Cardinal, Analyzed}) when Point_Cardinal =:= "sud" -> 
 	lists:append(Analyzed, [{lieu, region_ToBoundingBox(?Sud)}]);
 	% Sud : {"aquitaine","languedoc-roussillon", "midi-pyrenees", "provence-alpes-cotes-d'azur"}
+
+% DANS LE DEPARTEMENT 
+parse({"dans le", Departement, Analyzed}) -> 
+	Exist_G = string:str(Departement, "g"),
+	Exist_TA = string:str(Departement, "ta"),
+	Exist_VA = string:str(Departement, "va"),
+	if (Exist_G =:= 1 orelse Exist_TA =:= 1 orelse Exist_VA =:= 1) -> 
+		Tuple = lists:keyfind(Departement, 1, ?Departements),
+		if (Tuple =/= false) ->  lists:append(Analyzed, [{lieu, element(2, Tuple)}]);
+			true -> {error, unknown_departement}
+		end;
+		true -> 
+			Departement_le  = {"bas-rhin", "cher",	"doubs", "finistere", "haut-rhin", "jura", "loiret",
+								"loir-et-cher", "lot", "lot-et-garonne", "maine-et-loire", "morbihan", 
+								"nord", "pas-de-calais", "rhone"},
+			Exist = is_in_Tuple(Departement_le,   Departement),
+			if (Exist =/= 0) -> lists:append(Analyzed, [{lieu, element(2, lists:keyfind(Departement, 1, ?Departements))}]);
+				true -> {error, unknown_departement}
+			end
+	end;
+
+% DANS LA DEPARTEMENT
+parse({"dans la", Departement, Analyzed}) -> 
+	Departement_la = {"cote-d'or", "drome", "loire", "mayenne", "meuse", "nievre", "sarthe"},
+	Exist = is_in_Tuple(Departement_la, Departement),
+	if (Exist =/= 0) -> lists:append(Analyzed, [{lieu, element(2, lists:keyfind(Departement, 1, ?Departements))}]);
+		true -> {error, not_french}
+	end;
+
+% DANS LES DEPARTEMENT
+parse({"dans les", Departement, Analyzed}) -> 
+	Departement_les = {"bouches-du-rhone", "cotes-d'armor", "hautes-alpes", "hautes-pyrenees", 
+					   "hauts-de-seine", "landes", "pyrenees-atlantiques", "pyrenees-orientales",
+					   "vosges", "yvelines"},
+	Exist = is_in_Tuple(Departement_les, Departement),
+	if (Exist =/= 0) -> lists:append(Analyzed, [{lieu, element(2, lists:keyfind(Departement, 1, ?Departements))}]);
+		true -> {error, not_french}
+	end;
+
+parse({"dans", Departement, Analyzed}) -> 
+	New_Departement = list_to_tuple(string:tokens(Departement, "\'")),
+	if (element(1, New_Departement) =:= "l" andalso tuple_size(New_Departement) =:= 2) ->
+		Tuple = lists:keyfind(element(2, New_Departement), 1, ?Departements),
+		if (Tuple =/= false) -> 
+			Exist_A = string:str(element(2, New_Departement), "a"),
+			Exist_E = string:str(element(2, New_Departement), "e"),
+			Exist_I = string:str(element(2, New_Departement), "i"),
+				if  Exist_A =:= 1 orelse Exist_E =:= 1 orelse Exist_I =:= 1 orelse
+				   	element(2,New_Departement) =:= "herault" orelse 
+				   	element(2,New_Departement) =:= "yonne" -> 
+				   		lists:append(Analyzed, [{lieu, element(2, Tuple)}]);
+				true -> {error, unknown_departement}
+				end;
+			true -> {error, unknown_departement}
+		end;
+		true -> {New_Departement, error, something_wrong}
+	end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

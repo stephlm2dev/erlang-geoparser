@@ -7,6 +7,7 @@ Gère actuellement :
 - a VILLE précise
 - en REGION précise
 - dans l'/le POINT_CARDINAL
+- dans la/le/l'/les DEPARTEMENTS
 - a la mer/à la montagne
 - au bord de la mer
 - a cote de VILLE

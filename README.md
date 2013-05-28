@@ -7,7 +7,7 @@ Gère actuellement :
 - a VILLE précise
 - en REGION précise
 - dans l'/le POINT_CARDINAL
-- dans la/le/l'/les DEPARTEMENTS
+- dans la/le/l'/les DEPARTEMENT
 - a la mer/à la montagne
 - au bord de la mer
 - a cote de VILLE
@@ -22,11 +22,3 @@ Gère actuellement :
 2> geo_parser:analyser("your_search_between_quotes", Analyzed).
 ### Valeur de retour 
 [list_analyzed,{lieu,{X1, Y1, X2, Y2}}]
-
-## Exemple d'utilisation 
-
-1> c(geo_parser).   
-2> geo_parser:analyser("a PaRis").   
-{2.08679,48.658291,2.63791,49.04694}   
-3>   
-

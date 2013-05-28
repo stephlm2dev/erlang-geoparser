@@ -114,10 +114,11 @@ parse({"dans le", Departement, Analyzed}) ->
 		end;
 		true -> 
 			Departement_le  = {"bas-rhin", "cher",	"doubs", "finistere", "haut-rhin", "jura", "loiret",
-								"loir-et-cher", "lot", "lot-et-garonne", "maine-et-loire", "morbihan", 
-								"nord", "pas-de-calais", "rhone"},
-			Exist = is_in_Tuple(Departement_le,   Departement),
-			if (Exist =/= 0) -> lists:append(Analyzed, [{lieu, element(2, lists:keyfind(Departement, 1, ?Departements))}]);
+							   "loir-et-cher", "lot", "lot-et-garonne", "maine-et-loire", "morbihan", 
+							   "nord", "pas-de-calais", "rhone"},
+			Exist = is_in_Tuple(Departement_le, Departement),
+			if (Exist =/= 0) -> 
+				lists:append(Analyzed, [{lieu, element(2, lists:keyfind(Departement, 1, ?Departements))}]);
 				true -> {error, unknown_departement}
 			end
 	end;
@@ -140,6 +141,7 @@ parse({"dans les", Departement, Analyzed}) ->
 		true -> {error, not_french}
 	end;
 
+% DANS L' DEPARTEMENT
 parse({"dans", Departement, Analyzed}) -> 
 	New_Departement = list_to_tuple(string:tokens(Departement, "\'")),
 	if (element(1, New_Departement) =:= "l" andalso tuple_size(New_Departement) =:= 2) ->
@@ -156,7 +158,7 @@ parse({"dans", Departement, Analyzed}) ->
 				end;
 			true -> {error, unknown_departement}
 		end;
-		true -> {New_Departement, error, something_wrong}
+		true -> {error, something_wrong}
 	end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
